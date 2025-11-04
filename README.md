@@ -2,6 +2,10 @@
 
 ## Technos
 
+- Bun / TS
+- API: HONO 
+- Web: React / Tailwindcss
+
 ## Membres du groupe 
 
 - [Samuel SACRISTAN](https://github.com/codingdrone03)
