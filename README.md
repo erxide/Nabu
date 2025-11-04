@@ -1,11 +1,13 @@
 # Nabu
 
-### membres du groupe 
+## Technos
 
-- [Samuel SACRISTAN](https://github.com/codingdrone04)
+## Membres du groupe 
+
+- [Samuel SACRISTAN](https://github.com/codingdrone03)
 - [Alexandre BEL](https://github.com/FLizze)
 - [Erwan SINCK](https://github.com/erxide)
 
-## [BACK](./BACK)
+## [API](./API)
 
-## [FRONT](./FRONT)
+## [WEBSITE](./WEBSITE)
