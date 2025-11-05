@@ -4,6 +4,7 @@
 	- Produits
 		- [ ] Emprunter 
 		- [ ] Rendre 
+		- [ ] Tags
 	- Reservations
 		- [ ] Produits
 		- [ ] PC 
