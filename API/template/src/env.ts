@@ -1,13 +1,19 @@
 import {z, ZodError} from 'zod';
 
 const EnvSchema = z.object({
+    DB_PROTOCOL: z.string(),
+
     DB_HOST: z.string(),
 
-    DB_PORT: z.coerce.number(),
+    DB_PORT: z.coerce.number().optional(),
 
     DB_USERNAME: z.string(),
 
-    DB_PASSWORD: z.string()
+    DB_PASSWORD: z.string(),
+
+    DB_NAME: z.string(),
+
+    DB_MAX_RETRIES: z.coerce.number(),
 })
 
 export type EnvType = z.infer<typeof EnvSchema>;
