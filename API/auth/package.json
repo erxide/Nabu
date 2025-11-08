@@ -1,0 +1,25 @@
+{
+  "name": "template",
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun --hot src/index.ts",
+    "build": "bun build src/index.ts --compile --minify --outfile dist/nabu-auth"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@hono/zod-openapi": "^1.1.4",
+    "arangojs": "^10.1.2",
+    "bcrypt": "^6.0.0",
+    "hono": "^4.10.4",
+    "jose": "^6.1.0",
+    "zod": "^4.1.12"
+  }
+}
