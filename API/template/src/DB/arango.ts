@@ -5,13 +5,13 @@ import type { Cursor } from "arangojs/cursors";
 export default class ArangoDB {
     static #instance: ArangoDB;
 
-    private readonly protocol = 'http';
-    private readonly host = env.DB_HOST || "127.0.0.1";
-    private readonly port = env.DB_PORT || 8529;
-    private readonly username = env.DB_USERNAME || "";
-    private readonly password = env.DB_PASSWORD || ""; 
-    private readonly name = 'Nabu';
-    private readonly maxRetries = 5;
+    private readonly protocol = env.DB_PROTOCOL;
+    private readonly host = env.DB_HOST;
+    private readonly port = env.DB_PORT;
+    private readonly username = env.DB_USERNAME;
+    private readonly password = env.DB_PASSWORD; 
+    private readonly name = env.DB_NAME;
+    private readonly maxRetries = env.DB_MAX_RETRIES;
 
     private database!: Database;
 
@@ -25,7 +25,7 @@ export default class ArangoDB {
 
     private async connect(): Promise<void> {
         this.database = new Database({
-            url: `${this.protocol}://${this.host}:${this.port}`,
+            url: `${this.protocol}://${this.host}${this.port ? `:${this.port}` : ""}`,
             databaseName: this.name,
             maxRetries: this.maxRetries,
             auth: {username: this.username, password: this.password},
