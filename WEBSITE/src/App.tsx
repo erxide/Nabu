@@ -1,46 +1,36 @@
 import { useState, useEffect, useRef } from "react";
 import {
-    handleMouseWheel,
-    handleMouseMove,
-    handleMouseDown,
-    handleKeyDown,
+	handleMouseWheel,
+	handleMouseMove,
+	handleMouseDown,
+	handleKeyDown,
 } from "./handler";
 import { drawChairs, clearScreen, drawGrid, drawPreview } from "./draw";
 import type { Chair, Coords, Tool } from "./interfaces";
 import { ETool } from "./enums";
-
 import "./index.css";
 import armChair from "./img/armchair.svg";
 import deleteImg from "./img/delete.svg";
 
 const TOOL_LIST: Map<ETool, Tool> = new Map([
-    [
-        ETool.Add,
-        {
-            name: ETool.Add,
-            description: "add chair",
-            shortcut: "a",
-            img: armChair,
-        },
-    ],
-    [
-        ETool.Move,
-        {
-            name: ETool.Move,
-            description: "move grid",
-            shortcut: "m",
-            img: "./img/move.svg",
-        },
-    ],
-    [
-        ETool.Delete,
-        {
-            name: ETool.Delete,
-            description: "delete chair",
-            shortcut: "d",
-            img: deleteImg,
-        },
-    ],
+	[
+		ETool.Add,
+		{
+			name: ETool.Add,
+			description: "add chair",
+			shortcut: "a",
+			img: armChair,
+		},
+	],
+	[
+		ETool.Delete,
+		{
+			name: ETool.Delete,
+			description: "delete chair",
+			shortcut: "d",
+			img: deleteImg,
+		},
+	],
 ]);
 
 const LINE_WEIGHT = 0.2;
@@ -48,126 +38,127 @@ const ROW_NBR = 50;
 const COL_NBR = 50;
 
 export function App() {
-    const canvasRef = useRef<HTMLCanvasElement | null>(null);
-    const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
+	const canvasRef = useRef<HTMLCanvasElement | null>(null);
+	const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
 
-    const chairs = useRef<Map<string, Chair>>(new Map());
+	const chairs = useRef<Map<string, Chair>>(new Map());
 
-    const cellSize = useRef<number>(0);
+	const cellSize = useRef<number>(0);
 
-    const cursorAbsPosition = useRef<Coords>({ x: 0, y: 0 });
-    const cursorGridPosition = useRef<Coords>({ x: 0, y: 0 });
+	const cursorAbsPosition = useRef<Coords>({ x: 0, y: 0 });
+	const cursorGridPosition = useRef<Coords>({ x: 0, y: 0 });
 
-    const rotation = useRef<number>(0);
+	const rotation = useRef<number>(0);
 
-    const selectedTool = useRef<ETool>(ETool.Add);
-    const [selectedToolState, setSelectedToolState] = useState<ETool>(
-        ETool.Add,
-    );
+	const offset = useRef<Coords>({ x: 0, y: 0 });
 
-    const zoomLevel = useRef<number>(1);
+	const selectedTool = useRef<ETool>(ETool.Add);
+	const [selectedToolState, setSelectedToolState] = useState<ETool>(
+		ETool.Add,
+	);
 
-    function gameLoop() {
-        const canvas = canvasRef.current;
-        const ctx = ctxRef.current;
+	const zoomLevel = useRef<number>(1);
 
-        if (!canvas || !ctx) return;
+	function gameLoop() {
+		const canvas = canvasRef.current;
+		const ctx = ctxRef.current;
 
-        cellSize.current = Math.max(
-            zoomLevel.current * 10,
-            Math.min(canvas.width / COL_NBR, canvas.height / ROW_NBR),
-        );
+		if (!canvas || !ctx) return;
 
-        clearScreen(ctx, canvas);
+		cellSize.current = Math.max(
+			zoomLevel.current * 10,
+			Math.min(canvas.width / COL_NBR, canvas.height / ROW_NBR),
+		);
 
-        drawGrid(canvas, ctx, cellSize.current, LINE_WEIGHT);
+		clearScreen(ctx, canvas);
 
-        drawChairs(
-            ctx,
-            chairs.current,
-            cellSize.current,
-            cursorGridPosition.current,
-            selectedTool.current,
-        );
-        drawPreview(
-            ctx,
-            cursorGridPosition.current,
-            cellSize.current,
-            rotation.current,
-            TOOL_LIST.get(selectedTool.current)!,
-            chairs.current,
-        );
+		drawGrid(canvas, ctx, cellSize.current, LINE_WEIGHT);
 
-        requestAnimationFrame(gameLoop);
-    }
+		drawChairs(
+			ctx,
+			chairs.current,
+			cellSize.current,
+			cursorGridPosition.current,
+			selectedTool.current,
+		);
+		drawPreview(
+			ctx,
+			cursorGridPosition.current,
+			cellSize.current,
+			rotation.current,
+			TOOL_LIST.get(selectedTool.current)!,
+			chairs.current,
+		);
 
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
+		requestAnimationFrame(gameLoop);
+	}
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+	useEffect(() => {
+		const canvas = canvasRef.current;
+		if (!canvas) return;
 
-        const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
-        if (!ctx) return;
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
 
-        ctxRef.current = ctx;
+		const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+		if (!ctx) return;
 
-        requestAnimationFrame(gameLoop);
+		ctxRef.current = ctx;
 
-        const keyHandler = (e: KeyboardEvent) =>
-            handleKeyDown(e, rotation, selectedTool, setSelectedToolState);
-        document.addEventListener("keydown", keyHandler);
-        return () => {
-            document.removeEventListener("keydown", keyHandler);
-        };
-    }, []);
+		requestAnimationFrame(gameLoop);
 
-    return (
-        <>
-            <div className="absolute flex flex-col bg-white border left-4 top-4">
-                {Array.from(TOOL_LIST.entries()).map(([toolKey, tool]) => (
-                    <button
-                        title={`${tool.description} (${tool.shortcut})`}
-                        key={toolKey}
-                        onClick={() => {
-                            setSelectedToolState(toolKey);
-                            selectedTool.current = toolKey;
-                        }}
-                        className={`m-1 p-2 ${
-                            selectedToolState === toolKey
-                                ? "opacity-100"
-                                : "opacity-40"
-                        }`}
-                    >
-                        <img src={tool.img} className="w-12 h-12" />
-                    </button>
-                ))}
-            </div>
-            <canvas
-                ref={canvasRef}
-                onMouseDown={(e) =>
-                    handleMouseDown(
-                        e.nativeEvent,
-                        chairs,
-                        cursorGridPosition.current!,
-                        rotation.current!,
-                        TOOL_LIST.get(selectedToolState)!,
-                    )
-                }
-                onMouseMove={(e) =>
-                    handleMouseMove(
-                        e.nativeEvent,
-                        cursorAbsPosition,
-                        cursorGridPosition,
-                        canvasRef.current!,
-                        cellSize.current!,
-                    )
-                }
-                onWheel={(e) => handleMouseWheel(e.nativeEvent, zoomLevel)}
-            ></canvas>
-        </>
-    );
+		const keyHandler = (e: KeyboardEvent) =>
+			handleKeyDown(e, rotation, selectedTool, setSelectedToolState);
+		document.addEventListener("keydown", keyHandler);
+		return () => {
+			document.removeEventListener("keydown", keyHandler);
+		};
+	}, []);
+
+	return (
+		<>
+			<div className="absolute flex flex-col bg-white border left-4 top-4">
+				{Array.from(TOOL_LIST.entries()).map(([toolKey, tool]) => (
+					<button
+						title={`${tool.description} (${tool.shortcut})`}
+						key={toolKey}
+						onClick={() => {
+							setSelectedToolState(toolKey);
+							selectedTool.current = toolKey;
+						}}
+						className={`m-1 p-2 ${
+							selectedToolState === toolKey
+								? "opacity-100"
+								: "opacity-40"
+						}`}
+					>
+						<img src={tool.img} className="w-12 h-12" />
+					</button>
+				))}
+			</div>
+			<canvas
+				ref={canvasRef}
+				onMouseDown={(e) =>
+					handleMouseDown(
+						e.nativeEvent,
+						chairs,
+						cursorGridPosition.current!,
+						rotation.current!,
+						TOOL_LIST.get(selectedToolState)!,
+					)
+				}
+				onMouseMove={(e) =>
+					handleMouseMove(
+						e.nativeEvent,
+						cursorAbsPosition,
+						cursorGridPosition,
+						cellSize.current!,
+					)
+				}
+				onWheel={(e) => handleMouseWheel(e.nativeEvent, zoomLevel)}
+			></canvas>
+		</>
+	);
 }
 
 export default App;

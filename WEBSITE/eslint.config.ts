@@ -8,9 +8,7 @@ export default tseslint.config(
     // Base TS + React + Prettier
     {
         files: ["**/*.{ts,tsx}"],
-        extends: [
-            ...tseslint.configs.recommended,
-        ],
+        extends: [...tseslint.configs.recommended],
         plugins: {
             react: pluginReact,
             prettier: pluginPrettier,
@@ -30,6 +28,7 @@ export default tseslint.config(
             "prettier/prettier": [
                 "warn",
                 {
+                    useTabs: true,
                     tabWidth: 4,
                     singleQuote: false,
                     trailingComma: "all",
@@ -55,6 +54,7 @@ export default tseslint.config(
             "prettier/prettier": [
                 "warn",
                 {
+                    useTabs: true,
                     tabWidth: 4,
                     singleQuote: false,
                     trailingComma: "all",
@@ -62,5 +62,5 @@ export default tseslint.config(
                 },
             ],
         },
-    }
+    },
 );
