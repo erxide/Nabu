@@ -20,3 +20,8 @@
 		- [ ] PC / Place
 	- [ ] Register
 	- [ ] Login
+
+# LINTER
+
+bun tsc --noEmit # checks types
+bun run lint     # fixes formatting/lint issues
