@@ -16,13 +16,10 @@ export function drawChairs(
 	cellSize: number,
 	cursorGridPosition: Coords,
 	selectedTool: ETool,
+	offset: Coords,
 ) {
 	for (const [, chair] of chairs) {
-		const x = chair.coords.x * cellSize;
-		const y = chair.coords.y * cellSize;
-
 		let opacity = 1;
-
 		if (
 			chair.coords.x === cursorGridPosition.x &&
 			chair.coords.y === cursorGridPosition.y &&
@@ -31,7 +28,7 @@ export function drawChairs(
 			opacity = 0.4;
 		}
 
-		drawChair(ctx, x, y, cellSize, chair.rotation, opacity);
+		drawChair(ctx, chair, cellSize, opacity, offset);
 	}
 }
 
@@ -40,18 +37,19 @@ export function drawGrid(
 	ctx: CanvasRenderingContext2D,
 	cellSize: number,
 	LINE_WEIGHT: number,
+	offset: Coords,
 ) {
 	ctx.fillStyle = "black";
 	ctx.lineWidth = LINE_WEIGHT;
 
 	ctx.beginPath();
 
-	for (let x = 0; x <= canvas.width; x += cellSize) {
+	for (let x = offset.x % cellSize; x <= canvas.width; x += cellSize) {
 		ctx.moveTo(x, 0);
 		ctx.lineTo(x, canvas.height);
 	}
 
-	for (let y = 0; y <= canvas.height; y += cellSize) {
+	for (let y = offset.y % cellSize; y <= canvas.height; y += cellSize) {
 		ctx.moveTo(0, y);
 		ctx.lineTo(canvas.width, y);
 	}
@@ -73,25 +71,35 @@ export function drawPreview(
 	rotation: number,
 	tool: Tool,
 	chairs: Map<string, Chair>,
+	offset: Coords,
 ) {
-	const x = cursorGridPosition.x * cellSize;
-	const y = cursorGridPosition.y * cellSize;
+	const x = cursorGridPosition.x * cellSize + offset.x;
+	const y = cursorGridPosition.y * cellSize + offset.y;
 
 	switch (tool.name) {
-		case ETool.Delete:
+		case ETool.Delete: {
 			const chair = chairs.get(
 				`${cursorGridPosition.x}-${cursorGridPosition.y}`,
 			);
 			if (!chair) return;
 
-			drawDelete(ctx, x, y, cellSize);
+			ctx.drawImage(delImg, x, y, cellSize, cellSize);
 			break;
-		case ETool.Add:
+		}
+
+		case ETool.Add: {
 			if (chairs.get(`${cursorGridPosition.x}-${cursorGridPosition.y}`))
 				return;
 
-			drawChair(ctx, x, y, cellSize, rotation, 0.4);
+			const previewChair: Chair = {
+				coords: { x: cursorGridPosition.x, y: cursorGridPosition.y },
+				rotation,
+			};
+
+			drawChair(ctx, previewChair, cellSize, 0.4, offset);
 			break;
+		}
+
 		case ETool.Move:
 			break;
 		default:
@@ -99,28 +107,21 @@ export function drawPreview(
 	}
 }
 
-function drawDelete(
-	ctx: CanvasRenderingContext2D,
-	x: number,
-	y: number,
-	cellSize: number,
-) {
-	ctx.drawImage(delImg, x, y, cellSize, cellSize);
-}
-
 function drawChair(
 	ctx: CanvasRenderingContext2D,
-	x: number,
-	y: number,
+	chair: Chair,
 	cellSize: number,
-	rotation: number,
 	opacity: number = 1,
+	offset: Coords,
 ) {
-	const angle = (rotation * Math.PI) / 180;
+	const angle = (chair.rotation * Math.PI) / 180;
 
 	ctx.save();
 	ctx.globalAlpha = opacity;
-	ctx.translate(x + cellSize / 2, y + cellSize / 2);
+	ctx.translate(
+		chair.coords.x * cellSize + cellSize / 2 + offset.x,
+		chair.coords.y * cellSize + cellSize / 2 + offset.y,
+	);
 	ctx.rotate(angle);
 	ctx.drawImage(chairImg, -cellSize / 2, -cellSize / 2, cellSize, cellSize);
 	ctx.restore();

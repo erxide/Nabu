@@ -3,6 +3,7 @@ import {
 	handleMouseWheel,
 	handleMouseMove,
 	handleMouseDown,
+	handleMouseUp,
 	handleKeyDown,
 } from "./handler";
 import { drawChairs, clearScreen, drawGrid, drawPreview } from "./draw";
@@ -50,7 +51,11 @@ export function App() {
 
 	const rotation = useRef<number>(0);
 
+	const prevPosition = useRef<Coords>({ x: 0, y: 0 });
+	const isMiddleClickDown = useRef<boolean>(false);
+
 	const offset = useRef<Coords>({ x: 0, y: 0 });
+	const prevOffset = useRef<Coords>({ x: 0, y: 0 });
 
 	const selectedTool = useRef<ETool>(ETool.Add);
 	const [selectedToolState, setSelectedToolState] = useState<ETool>(
@@ -59,7 +64,7 @@ export function App() {
 
 	const zoomLevel = useRef<number>(1);
 
-	function gameLoop() {
+	function render() {
 		const canvas = canvasRef.current;
 		const ctx = ctxRef.current;
 
@@ -72,7 +77,7 @@ export function App() {
 
 		clearScreen(ctx, canvas);
 
-		drawGrid(canvas, ctx, cellSize.current, LINE_WEIGHT);
+		drawGrid(canvas, ctx, cellSize.current, LINE_WEIGHT, offset.current);
 
 		drawChairs(
 			ctx,
@@ -80,6 +85,7 @@ export function App() {
 			cellSize.current,
 			cursorGridPosition.current,
 			selectedTool.current,
+			offset.current,
 		);
 		drawPreview(
 			ctx,
@@ -88,9 +94,8 @@ export function App() {
 			rotation.current,
 			TOOL_LIST.get(selectedTool.current)!,
 			chairs.current,
+			offset.current,
 		);
-
-		requestAnimationFrame(gameLoop);
 	}
 
 	useEffect(() => {
@@ -105,11 +110,14 @@ export function App() {
 
 		ctxRef.current = ctx;
 
-		requestAnimationFrame(gameLoop);
+		render();
 
-		const keyHandler = (e: KeyboardEvent) =>
+		const keyHandler = (e: KeyboardEvent) => {
 			handleKeyDown(e, rotation, selectedTool, setSelectedToolState);
+			render();
+		};
 		document.addEventListener("keydown", keyHandler);
+
 		return () => {
 			document.removeEventListener("keydown", keyHandler);
 		};
@@ -138,24 +146,40 @@ export function App() {
 			</div>
 			<canvas
 				ref={canvasRef}
-				onMouseDown={(e) =>
+				onMouseDown={(e) => {
 					handleMouseDown(
 						e.nativeEvent,
 						chairs,
 						cursorGridPosition.current!,
 						rotation.current!,
 						TOOL_LIST.get(selectedToolState)!,
-					)
+						isMiddleClickDown,
+						prevPosition,
+						prevOffset,
+						offset.current,
+					);
+					render();
+				}}
+				onMouseUp={(e) =>
+					handleMouseUp(e.nativeEvent, isMiddleClickDown)
 				}
-				onMouseMove={(e) =>
+				onMouseMove={(e) => {
 					handleMouseMove(
 						e.nativeEvent,
 						cursorAbsPosition,
 						cursorGridPosition,
 						cellSize.current!,
-					)
-				}
-				onWheel={(e) => handleMouseWheel(e.nativeEvent, zoomLevel)}
+						isMiddleClickDown.current,
+						offset,
+						prevOffset.current,
+						prevPosition.current,
+					);
+					render();
+				}}
+				onWheel={(e) => {
+					handleMouseWheel(e.nativeEvent, zoomLevel);
+					render();
+				}}
 			></canvas>
 		</>
 	);
