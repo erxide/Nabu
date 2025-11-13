@@ -54,6 +54,7 @@ export default class ArangoDB {
             }
             error.query = query;
             error.trace = trace;
+            error.bindVars = bindVars;
             throw error
         }
     }

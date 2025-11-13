@@ -1,5 +1,6 @@
 import type { Context, Next } from "hono";
 import { verifyJWT } from "../utils/jwt";
+import type { Users } from "../type";
 
 export const authMiddleware = async (c: Context, next: Next) => {
     const authHeader = c.req.header('authorization');

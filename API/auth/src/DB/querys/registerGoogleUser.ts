@@ -1,8 +1,7 @@
-import { password } from "bun";
 import type { NewUser, Users } from "../../type";
 import ArangoDB from "../arango";
 
-export const registerUser = async (user:NewUser):Promise<Users> => {
+export const registerGoogleUser = async (user: NewUser):Promise<Users> => {
     const db = await ArangoDB.instance();
 
     const bindVars = {user}
@@ -13,6 +12,6 @@ export const registerUser = async (user:NewUser):Promise<Users> => {
         RETURN NEW
     `, bindVars)
 
-    const newuser:Users = await cursor.next();
-    return newuser
+    const newUser:Users = await cursor.next();
+    return newUser
 };

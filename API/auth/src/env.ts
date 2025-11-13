@@ -3,6 +3,12 @@ import {z, ZodError} from 'zod';
 const EnvSchema = z.object({
     JWT_TOKEN: z.string(),
 
+    REDIS_HOST: z.string(),
+
+    REDIS_PORT: z.coerce.number(),
+
+    REDIS_PASSWORD: z.string(),
+
     DB_PROTOCOL: z.string(),
 
     DB_HOST: z.string(),
@@ -16,6 +22,16 @@ const EnvSchema = z.object({
     DB_NAME: z.string(),
 
     DB_MAX_RETRIES: z.coerce.number(),
+
+    GOOGLE_CLIENT_ID: z.string(),
+
+    GOOGLE_CLIENT_SECRET: z.string(),
+
+    GOOGLE_REDIRECT_URI: z.string(),
+
+    GITHUB_CLIENT_ID: z.string(),
+
+    GITHUB_CLIENT_SECRET: z.string()
 })
 
 export type EnvType = z.infer<typeof EnvSchema>;

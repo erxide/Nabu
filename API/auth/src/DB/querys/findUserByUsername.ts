@@ -1,7 +1,7 @@
 import type { Users } from "../../type";
 import ArangoDB from "../arango";
 
-export const checkUserExists = async (username: Users['username']):Promise<boolean> => {
+export const findUserByUsername = async (username: Users['username']):Promise<Users|null> => {
     const db = await ArangoDB.instance();
 
     const bindVars = { username }
@@ -12,6 +12,5 @@ export const checkUserExists = async (username: Users['username']):Promise<boole
             RETURN u
         `, bindVars);
 
-    const result = await cursor.next();
-    return !!result;
+    return await cursor.next();
 };
