@@ -1,4 +1,4 @@
-import { ETool } from "./enums";
+import { ETool } from "@/types/enums";
 
 export interface Chair {
 	coords: Coords;
