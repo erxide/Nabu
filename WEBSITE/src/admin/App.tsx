@@ -126,7 +126,7 @@ export default function App() {
 		const handleWindowSize = () => {
 			canvas.width = window.innerWidth;
 			canvas.height = window.innerHeight;
-			drawGrid(canvas, ctx, cellSize.current, LINE_WEIGHT, offset.current);
+			render();
 		};
 
 		handleWindowSize();
@@ -142,24 +142,38 @@ export default function App() {
 
 	return (
 		<>
-			<div className="flex flex-col bg-white border left-4 top-4 bg-blue-500 absolute">
-				{Array.from(TOOL_LIST.entries()).map(([toolKey, tool]) => (
-					<button
-						title={`${tool.description} (${tool.shortcut})`}
-						key={toolKey}
-						onClick={() => {
-							setSelectedToolState(toolKey);
-							selectedTool.current = toolKey;
-						}}
-						className={`m-1 p-2 h-20 w-20 ${
-							selectedToolState === toolKey
-								? "opacity-100"
-								: "opacity-40"
-						}`}
-					>
-						<img src={tool.img} className="w-12 h-12" />
-					</button>
-				))}
+			<div className="flex gap-4 absolute p-4">
+				<div className="flex flex-col bg-white border">
+					{Array.from(TOOL_LIST.entries()).map(([toolKey, tool]) => (
+						<button
+							title={`${tool.description} (${tool.shortcut})`}
+							key={toolKey}
+							onClick={() => {
+								setSelectedToolState(toolKey);
+								selectedTool.current = toolKey;
+							}}
+							className={`m-1 p-2 h-16 w-16 ${
+								selectedToolState === toolKey
+									? "opacity-100"
+									: "opacity-40"
+							}`}
+						>
+							<img src={tool.img} />
+						</button>
+					))}
+				</div>
+				<button
+					className="border bg-white h-fit"
+					onClick={() => {
+						for (const entry of chairs.current.entries()) {
+							const chair: Chair = entry[1];
+
+							console.log(chair);
+						}
+					}}
+				>
+					<img className="m-1 p-2 h-14 w-14" src="/save.svg" />
+				</button>
 			</div>
 			<canvas
 				ref={canvasRef}
