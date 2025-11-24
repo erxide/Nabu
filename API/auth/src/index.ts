@@ -4,7 +4,7 @@ import { cors } from "hono/cors";
 
 // import { authRoute } from './routes/auth';
 import { usersRoute } from './routes/users';
-import { googleAuth } from './routes/googleAuthREDIS';
+import { googleAuth } from './routes/googleAuth';
 import health from './routes/health';
 
 const app = new OpenAPIHono();

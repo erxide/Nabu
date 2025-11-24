@@ -1,7 +1,7 @@
 import { Hono } from "hono";
-import { findUserByUsername } from "../DB/querys/findUserByUsername";
+import { findUserByUsername } from "../DB/queries/findUserByUsername";
 import { comparePassword, hashPassword } from "../utils/hash";
-import { registerUser } from "../DB/querys/registerUser";
+import { registerUser } from "../DB/queries/registerUser";
 import { signJWT } from "../utils/jwt";
 
 export const authRoute = new Hono();

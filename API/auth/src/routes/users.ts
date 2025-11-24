@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { authMiddleware } from "../middleware/auth";
 import type { Users } from "../type";
-import { findUserByID } from "../DB/querys/findUserByID";
+import { findUserByID } from "../DB/queries/findUserByID";
 
 type AuthContext = {
     Variables: {
