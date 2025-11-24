@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import {
 	handleMouseUp,
-		handleMouseWheel,
-		handleMouseMove,
-		handleMouseDown,
+	handleMouseWheel,
+	handleMouseMove,
+	handleMouseDown,
 } from "@/handler/mouse";
 import { handleKeyDown } from "@/handler/keyboard";
 import { drawPreview } from "@/draw/preview";
@@ -14,24 +14,24 @@ import { Coords, Tool, Chair } from "@/types/interfaces";
 import { ETool } from "@/types/enums";
 
 const TOOL_LIST: Map<ETool, Tool> = new Map([
-		[
+	[
 		ETool.Add,
 		{
-name: ETool.Add,
-description: "add chair",
-shortcut: "a",
-img: "/chair.svg",
-},
-		],
-		[
+			name: ETool.Add,
+			description: "add chair",
+			shortcut: "a",
+			img: "/chair.svg",
+		},
+	],
+	[
 		ETool.Delete,
 		{
-name: ETool.Delete,
-description: "delete a chair",
-shortcut: "d",
-img: "/delete.svg",
-},
-		],
+			name: ETool.Delete,
+			description: "delete a chair",
+			shortcut: "d",
+			img: "/delete.svg",
+		},
+	],
 ]);
 
 const LINE_WEIGHT = 0.2;
@@ -59,8 +59,8 @@ export default function App() {
 
 	const selectedTool = useRef<ETool>(ETool.Add);
 	const [selectedToolState, setSelectedToolState] = useState<ETool>(
-			ETool.Add,
-			);
+		ETool.Add,
+	);
 
 	const zoomLevel = useRef<number>(1);
 
@@ -71,9 +71,9 @@ export default function App() {
 		if (!canvas || !ctx) return;
 
 		cellSize.current = Math.max(
-				zoomLevel.current * 10,
-				Math.min(canvas.width / COL_NBR, canvas.height / ROW_NBR),
-				);
+			zoomLevel.current * 10,
+			Math.min(canvas.width / COL_NBR, canvas.height / ROW_NBR),
+		);
 
 		clearScreen(ctx, canvas);
 
@@ -86,77 +86,85 @@ export default function App() {
 		deleteImg.src = "/delete.svg";
 
 		drawChairs(
-				ctx,
-				chairs.current,
-				cellSize.current,
-				cursorGridCoords.current,
-				selectedTool.current,
-				offset.current,
-				chairImg,
-				);
+			ctx,
+			chairs.current,
+			cellSize.current,
+			cursorGridCoords.current,
+			selectedTool.current,
+			offset.current,
+			chairImg,
+		);
 		drawPreview(
-				ctx,
-				cursorGridCoords.current,
-				cellSize.current,
-				rotation.current,
-				TOOL_LIST.get(selectedTool.current)!,
-				chairs.current,
-				offset.current,
-				chairImg,
-				deleteImg,
-				);
+			ctx,
+			cursorGridCoords.current,
+			cellSize.current,
+			rotation.current,
+			TOOL_LIST.get(selectedTool.current)!,
+			chairs.current,
+			offset.current,
+			chairImg,
+			deleteImg,
+		);
 	}
 
 	useEffect(() => {
-			const canvas = canvasRef.current;
-			if (!canvas) return;
+		const canvas = canvasRef.current;
+		if (!canvas) return;
 
-			canvas.width = window.innerWidth;
-			canvas.height = window.innerHeight;
+		const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+		if (!ctx) return;
 
-			const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
-			if (!ctx) return;
+		ctxRef.current = ctx;
 
-			ctxRef.current = ctx;
+		render();
 
-			render();
-
-			const keyHandler = (e: KeyboardEvent) => {
+		const keyHandler = (e: KeyboardEvent) => {
 			handleKeyDown(e, rotation, selectedTool, setSelectedToolState);
 			render();
-			};
-			document.addEventListener("keydown", keyHandler);
+		};
 
-			return () => {
-				document.removeEventListener("keydown", keyHandler);
-			};
+		const handleWindowSize = () => {
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
+			drawGrid(canvas, ctx, cellSize.current, LINE_WEIGHT, offset.current);
+		};
+
+		handleWindowSize();
+
+		window.addEventListener("resize", handleWindowSize);
+		document.addEventListener("keydown", keyHandler);
+
+		return () => {
+			document.removeEventListener("keydown", keyHandler);
+			window.removeEventListener("resize", handleWindowSize);
+		};
 	}, []);
 
 	return (
-			<>
+		<>
 			<div className="flex flex-col bg-white border left-4 top-4 bg-blue-500 absolute">
-			{Array.from(TOOL_LIST.entries()).map(([toolKey, tool]) => (
-						<button
+				{Array.from(TOOL_LIST.entries()).map(([toolKey, tool]) => (
+					<button
 						title={`${tool.description} (${tool.shortcut})`}
 						key={toolKey}
 						onClick={() => {
-						setSelectedToolState(toolKey);
-						selectedTool.current = toolKey;
+							setSelectedToolState(toolKey);
+							selectedTool.current = toolKey;
 						}}
 						className={`m-1 p-2 h-20 w-20 ${
-						selectedToolState === toolKey
-						? "opacity-100"
-						: "opacity-40"
+							selectedToolState === toolKey
+								? "opacity-100"
+								: "opacity-40"
 						}`}
-						>
+					>
 						<img src={tool.img} className="w-12 h-12" />
-						</button>
-						))}
+					</button>
+				))}
 			</div>
-				<canvas
+			<canvas
 				ref={canvasRef}
-			onMouseDown={(e) => {
-				handleMouseDown(
+				onMouseDown={(e) => {
+					handleMouseDown(
 						e.nativeEvent,
 						chairs,
 						cursorGridCoords.current!,
@@ -166,14 +174,14 @@ export default function App() {
 						prevCoords,
 						prevOffset,
 						offset.current,
-						);
-				render();
-			}}
-			onMouseUp={(e) =>
-				handleMouseUp(e.nativeEvent, isMiddleClickDown)
-			}
-			onMouseMove={(e) => {
-				handleMouseMove(
+					);
+					render();
+				}}
+				onMouseUp={(e) =>
+					handleMouseUp(e.nativeEvent, isMiddleClickDown)
+				}
+				onMouseMove={(e) => {
+					handleMouseMove(
 						e.nativeEvent,
 						cursorAbsCoords,
 						cursorGridCoords,
@@ -182,14 +190,14 @@ export default function App() {
 						offset,
 						prevOffset.current,
 						prevCoords.current,
-						);
-				render();
-			}}
-			onWheel={(e) => {
-				handleMouseWheel(e.nativeEvent, zoomLevel);
-				render();
-			}}
+					);
+					render();
+				}}
+				onWheel={(e) => {
+					handleMouseWheel(e.nativeEvent, zoomLevel);
+					render();
+				}}
 			></canvas>
-				</>
-				);
+		</>
+	);
 }

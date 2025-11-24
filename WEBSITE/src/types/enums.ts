@@ -1,6 +1,7 @@
 export enum ETool {
 	Add = 0,
 	Delete = 1,
+	Save = 2,
 }
 
 export enum EClick {
